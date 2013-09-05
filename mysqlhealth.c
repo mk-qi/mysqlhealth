@@ -3,9 +3,8 @@
  * root@mkrss.com
  * build:
  *   osx:  make
- *   linux: make
- *   make static:  
- *   will  link libmysqlclient.so as static
+ *   linux: make  or make static  
+ *   make static will  link libmysqlclient.so as static
  *   so that you need not install mysql-client package again
  *
  */
