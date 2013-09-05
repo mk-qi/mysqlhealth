@@ -1,11 +1,16 @@
 /*
- * check_mysqhealth_daemon.c  v0.0.1.1
+ * mysqlhealth.c  v0.0.1.1
  * root@mkrss.com
+ * build:
+ *   osx:  make
+ *   linux: make
+ *   make static:  
+ *   will  link libmysqlclient.so as static
+ *   so that you need not install mysql-client package again
  *
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <mysql/mysql.h>
 #include <mysql/errmsg.h>
 #include <string.h>
@@ -18,10 +23,8 @@
 #include <stdarg.h>
 #include <sys/time.h>
 #include <time.h> /* For  Linux */
-#include <stdio.h>
 #include <errno.h>
 #include <arpa/inet.h>  /*inet_ntoa*/
-
 
 /* debug */
 #define debug 1
@@ -57,7 +60,6 @@ long long ustime(void) {
     ust += tv.tv_usec;
     return ust;
 }
-
 // HTTP response code 
 static char* ok_response =
   "HTTP/1.0 200 OK\r\n"
@@ -145,8 +147,6 @@ void daemonize() {
     dup(i);
     dup(i);
 }
-
-
 void socket_server(int port) {
     int svr_sock, cli_sock;
 	socklen_t clilen;
@@ -218,7 +218,6 @@ static void handle_connect (int client_socket)
 	close(client_socket);
 }
 /*  */
-
 int mysqlhealth(char *host, char *user, char *pass, char *dbase, char *query) {
     long long start = ustime();
     MYSQL mysql; char *msg;
