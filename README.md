@@ -42,3 +42,42 @@ xinet.d+shell 的问题是经常响应超时,而且没有太多的日志说明�
 * 守护进程的安全
   进程唯一性: 同一时间只能运行一个进程.如果重复运行会直接退出,不给任何提示
   进程常驻保证: 已然是后台daemon进程,然后通过inittab的respawn时实进程守护来保证此进程不会被停掉
+
+3. 相关输出细节
+------------
+```
+tail -f /tmp/mysqlhealth.log 
+[20792] 06 Sep 14:14:06.984 INFO show processlist with : 0.000 seconds
+[20792] 06 Sep 14:14:07.583 INFO connection accepted from 192.168.2.42
+[20792] 06 Sep 14:14:07.583 (***) MySql Server Version: 5.5.20-log
+[20792] 06 Sep 14:14:07.584 INFO show processlist with : 0.000 seconds
+[20792] 06 Sep 14:14:09.985 INFO connection accepted from 192.168.2.42
+```
+
+```
+telnet localhost 5000
+Trying 127.0.0.1...
+Connected to localhost.localdomain (127.0.0.1).
+Escape character is '^]'.
+
+HTTP/1.0 200 OK
+Content-type: text/html
+
+<html>
+ <body>
+  <p>This server running ok.</p>
+ </body>
+</html>
+Connection closed by foreign host.
+```
+```
+curl  http://localhost:5000 -i
+HTTP/1.0 200 OK
+Content-type: text/html
+
+<html>
+ <body>
+  <p>This server running ok.</p>
+ </body>
+</html>
+```
