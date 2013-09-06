@@ -1,19 +1,17 @@
 1. 这个工具有什么用
-=============
-这个工具以守护进程的方式运行在MySQL服务器上,默认监听5000端口(可调整),接受来自己远端的tcp或是http触发请求.
-当接受到一个tcp或是http的数据包的时候,此脚本会连接本地的mysql,然后执行一个查询,如果查询成功
-传送包含http status code 为200 的数据包到 触发端,如果查询失败,传送包含http status code 为500 
-的数据包到触发端.
+------------
+此脚本的的产生是为了代替Haproxy检测mysql可用性功能的.
+Haproxy默认仅是用户名和密码连接一下mysql这的端口,这种检测方法过于简单,不适用以复杂的业务需求.
 
-如你所想,这个脚本的的产生是为了代替Haproxy自身检测Mysql可用性功能.
-Haproxy默认针检测mysql的健康状况的动作仅是用给定的用户名和密码连接一下mysql,
-这种检测方法过于简单,所以不适用以复杂的业务需求.
+此工具以守护进程的方式运行在MySQL服务器上,TCP监听在5000端口(可调整),通过tcp或是http连接来触发对mysql的检测.
 
-此脚本默认检测mysql可用性的方法为判断 "show processlist",有无正常返回且要在特定时间返回.
-当然这个检测方法也不一定能把mysql所有的问题检测出来,可以根据业务需求,进行查询语句的改进.
+此脚本默认检测mysql可用性的方法是执行"show processlist"查询,然后以执行是否成功来判定.
+检测失败,会返回一个http status code为 500 内容到client端,然后会把相应的失败信息写进log,检测成功,
+则返回http status code 200 的内容到clinet同时记录mysql check 所花费的时间(查询时间)
+当然"show processlist"也不一定能把mysql所有的问题检测出来,但是这个查询是可以调整.
 
 2. 为什么不用别人写好的脚本
-=============
+------------
 是的,这种端口监听,守护进程,连接mysql,处理http请求的脚本其它语言perl,python,ruby,php.
 还有linux 自来的xinetd加上shell脚本,都可以实现,而且github上也有现成的.为什么还要用C来实现一个.
 首先是这些语方都需要安装一些复杂的扩展包,比如mysql连接器,perl需要安装perl-DBI,python的MySQldb,ruby也是需安装相应的gem包.
@@ -23,4 +21,24 @@ xinet.d+shell 的问题是经常响应超时,而且没有太多的日志说明�
 
 
 3. 如何用好此脚本
-=============
+------------
+* 调整用户名
+    打开 mysqlhealth.c 文件的 32 行,即可看到相应的项,直接变更,重新编绎就可以.
+  ```
+
+    /* DATABASE  connection info */
+    #define DBSERVER   "localhost"
+    #define DBUSER     "用户名"
+    #define DBPASS     "密码"
+    #define DBNAME     "information_schema"
+    #define QUERY      "show processlist"
+  ```
+* 编绎和平台问题
+  编绎:
+静态编绎 仅限centos5和centos6和mysqclient5.1和5.5版本,其它的版本没有测试过 编绎方法为 make static
+动态编绎 osx 平台只能动态编绎 直接make 
+平台: osx 和unix like
+
+* 守护进程的安全
+  进程唯一性: 同一时间只能运行一个进程.如果重复运行会直接退出,不给任何提示
+  进程常驻保证: 已然是后台daemon进程,然后通过inittab的respawn时实进程守护来保证此进程不会被停掉
