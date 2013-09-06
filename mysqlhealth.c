@@ -225,8 +225,11 @@ int mysqlhealth(char *host, char *user, char *pass, char *dbase, char *query) {
 	{
 		log_msg(2, "MySql Initialization Error!");
     } else {
-		if(mysql_real_connect(&mysql, host, user, pass, dbase, 0, NULL, 0) == NULL) {
-			log_msg(2, "MySql Server Error: %s", mysql_error(&mysql));
+    	mysql_options(&mysql,MYSQL_OPT_CONNECT_TIMEOUT, "5");
+    	mysql_options(&mysql,MYSQL_READ_DEFAULT_GROUP,PgName);
+    	if(mysql_real_connect(&mysql, host, user, pass, dbase, 3306, NULL, 0) == NULL)
+    	{
+    		log_msg(2, "MySql Server Error: %s", mysql_error(&mysql));
 			return(2);
 		} else {
 			if (debug){
