@@ -14,7 +14,7 @@ Haproxy默认仅是用户名和密码连接一下mysql这的端口,这种检测�
 ------------
 是的,这种端口监听,守护进程,连接mysql,处理http请求的脚本其它语言perl,python,ruby,php.
 还有linux 自来的xinetd加上shell脚本,都可以实现,而且github上也有现成的.为什么还要用C来实现一个.
-首先是这些语方都需要安装一些复杂的扩展包,比如mysql连接器,perl需要安装perl-DBI,python的MySQldb,ruby也是需安装相应的gem包.
+首先是这些语言都需要安装一些复杂的扩展包,比如mysql连接器,perl需要安装perl-DBI,python的MySQldb,ruby也是需安装相应的gem包.
 守护进程什么的,就更需要其它的扩展包了,有时候MySQL服务器上是不能上网或是不能随便安装软件包的.
 xinet.d+shell 的问题是经常响应超时,而且没有太多的日志说明问题在什么地方.
 所以现成的脚本,可以用,但是并不好用.
