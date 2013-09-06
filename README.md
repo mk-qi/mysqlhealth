@@ -35,9 +35,9 @@ xinet.d+shell 的问题是经常响应超时,而且没有太多的日志说明�
   ```
 * 编绎和平台问题
   编绎:
-静态编绎 仅限centos5和centos6和mysqclient5.1和5.5版本,其它的版本没有测试过 编绎方法为 make static
-动态编绎 osx 平台只能动态编绎 直接make 
-平台: osx 和unix like
+    静态编绎 仅限centos5和centos6和RPM包版MySQL-Client5.1和5.5版本,其它的版本没有测试过,编绎方法为 make static
+    动态编绎 osx 平台只能动态编绎直接 make 
+    平台: osx 和unix like
 
 * 守护进程的安全
   进程唯一性: 同一时间只能运行一个进程.如果重复运行会直接退出,不给任何提示
