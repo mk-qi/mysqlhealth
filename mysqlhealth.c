@@ -46,10 +46,9 @@
 #define DEBUG		4
 #define LogFile 	"/tmp/mysqlhealth.log"
 
-/* FUNCTION DECLARATION */
-int mysqlhealth( char *host, char *user, char *pass, char *dbase, char *query );
-static void handle_connect( int client_socket );
-/* Return the UNIX time in microseconds */
+/* Socket read time out */
+#define timeouts  5
+
 long long ustime( void )
 {
 	struct timeval	tv;
@@ -60,6 +59,10 @@ long long ustime( void )
 	return(ust);
 }
 
+/* FUNCTION DECLARATION */
+int mysqlhealth( char *host, char *user, char *pass, char *dbase, char *query );
+static void handle_connect( int client_socket );
+/* Return the UNIX time in microseconds */
 
 /* HTTP response code */
 static char* ok_response =
@@ -164,6 +167,12 @@ void socket_server( int port )
 	int			svr_sock, cli_sock;
 	socklen_t		clilen;
 	struct sockaddr_in	serv_addr, cli_addr;
+    
+    /* socket recive timeouts  */
+    struct timeval timeout;      
+           timeout.tv_sec = 10;
+           timeout.tv_usec = 0;
+    //
 	svr_sock = socket( AF_INET, SOCK_STREAM, 0 );
 	if ( svr_sock < 0 )
 	{
@@ -176,6 +185,11 @@ void socket_server( int port )
 	{
 		exit( 1 );
 	}
+    // socket recive timeout = 5s/
+    if (setsockopt ( svr_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,sizeof(timeout)) < 0){
+        exit( 1 );
+    }
+                    
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= INADDR_ANY;
 	serv_addr.sin_port		= htons( port );
@@ -204,7 +218,6 @@ void socket_server( int port )
 				log_msg( 2, "accept error: %i", errno );
 		}
 		getpeername( cli_sock, (struct sockaddr *) &cli_addr, &clilen );
-		log_msg( 1, "connection accepted from %s", inet_ntoa( cli_addr.sin_addr ) );
 		handle_connect( cli_sock );
 	} /* while end */
 	close( svr_sock );
@@ -213,7 +226,8 @@ void socket_server( int port )
 
 /*   */
 static void handle_connect( int client_socket )
-{
+{   
+    long long pstart = ustime();
 	int	buffer_len	= 1024;
 	char	* request	= (char *) malloc( buffer_len );
 	memset( request, 0, buffer_len * sizeof(char) );
@@ -238,6 +252,8 @@ static void handle_connect( int client_socket )
 	free( request );
 	free( method );
 	close( client_socket );
+	log_msg( 1, "show %.3f",(float) (ustime() - pstart) );
+    
 }
 
 
@@ -287,9 +303,8 @@ int mysqlhealth( char *host, char *user, char *pass, char *dbase, char *query )
 	return(1);
 }
 
-
 int main()
-{
+{   
 	daemonize();
 	socket_server( 5000 );
 	return(0);
