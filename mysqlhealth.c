@@ -168,11 +168,11 @@ void socket_server( int port )
 	socklen_t		clilen;
 	struct sockaddr_in	serv_addr, cli_addr;
     
-    /* socket recive timeouts  */
-    struct timeval timeout;      
+    	/* socket recive timeouts  */
+    	struct timeval timeout;      
            timeout.tv_sec = 10;
            timeout.tv_usec = 0;
-    //
+    	//
 	svr_sock = socket( AF_INET, SOCK_STREAM, 0 );
 	if ( svr_sock < 0 )
 	{
@@ -185,10 +185,10 @@ void socket_server( int port )
 	{
 		exit( 1 );
 	}
-    // socket recive timeout = 5s/
-    if (setsockopt ( svr_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,sizeof(timeout)) < 0){
-        exit( 1 );
-    }
+    	// socket recive timeout = 5s/
+    	if (setsockopt ( svr_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,sizeof(timeout)) < 0){
+        	exit( 1 );
+	}
                     
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= INADDR_ANY;
